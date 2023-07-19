@@ -3,8 +3,11 @@
 Each function returns a QuantumCircuit object, only paramerized by the
 number of qubits.
 """
+import cirq_to_qiskit
+import HamiltonianSimulation
 import networkx as nx
 import numpy as np
+import openfermion as of
 from qiskit import QuantumCircuit
 from qiskit.algorithms import AmplificationProblem, Grover
 from qiskit.circuit.library import (
@@ -141,6 +144,25 @@ def grover(q):
     return grover_qc
 
 
+# Hubbard
+def hub(q):
+    """Return a Fermi-Hubbard circuit."""
+    # define the Hamiltonian
+    # Parameters.
+    nsites = int(q / 2)
+    U = 2.0
+    J = -1.0
+
+    hubbard = of.fermi_hubbard(1, nsites, tunneling=-J, coulomb=U, periodic=False)
+    qasm = of.trotterize_exp_qubop_to_qasm(hamiltonian=hubbard)
+    return QuantumCircuit.from_qasm_file(qasm)
+
+
+def tfim(q):
+    """Return a Transverse Ising Models (TFIM) circuit."""
+    return cirq_to_qiskit(HamiltonianSimulation(q, 1 / depth, 0.5).circuit())
+
+
 # List of all available circuits
 available_circuits = [
     vqe_full,
@@ -153,4 +175,6 @@ available_circuits = [
     ghz,
     hlf,
     grover,
+    hub,
+    tfim,
 ]

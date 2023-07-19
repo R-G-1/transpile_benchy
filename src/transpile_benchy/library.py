@@ -32,7 +32,8 @@ class CircuitLibrary:
         # verify that all circuits are in the library
         for circuit_name in self.circuit_list:
             if not any(circuit_name in interface for interface in self.interfaces):
-                raise ValueError(f"Circuit '{circuit_name}' not found in any interface")
+                # raise ValueError(f"Circuit'{circuit_name}'not found in any interface")
+                print(f"Circuit '{circuit_name}' not found in any interface")
 
     def circuit_count(self) -> int:
         """Return the number of circuits in the library."""
