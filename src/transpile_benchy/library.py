@@ -44,6 +44,9 @@ class CircuitLibrary:
         """Initialize the library from a text file."""
         with open(filename, "r") as f:
             circuit_list = f.read().splitlines()
+        circuit_list = [
+            c.lower() for c in circuit_list
+        ]  # force all names to follow convention
         return cls(circuit_list)
 
     @classmethod

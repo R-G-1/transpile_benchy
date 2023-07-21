@@ -3,8 +3,6 @@
 Each function returns a QuantumCircuit object, only paramerized by the
 number of qubits.
 """
-import cirq_to_qiskit
-import HamiltonianSimulation
 import networkx as nx
 import numpy as np
 import openfermion as of
@@ -21,6 +19,8 @@ from qiskit.circuit.library.arithmetic.adders.cdkm_ripple_carry_adder import (
 )
 from qiskit.circuit.library.arithmetic.multipliers import RGQFTMultiplier
 from qiskit.circuit.library.basis_change import QFT
+from supermarq.benchmarks.hamiltonian_simulation import HamiltonianSimulation
+from supermarq.converters import cirq_to_qiskit
 
 depth = 2  # arbitary idk what to set this to
 
@@ -146,7 +146,11 @@ def grover(q):
 
 # Hubbard
 def hub(q):
-    """Return a Fermi-Hubbard circuit."""
+    """Return a Fermi-Hubbard circuit.
+
+    function from OpenFermion
+    https://github.com/quantumlib/OpenFermion
+    """
     # define the Hamiltonian
     # Parameters.
     nsites = int(q / 2)
@@ -159,7 +163,10 @@ def hub(q):
 
 
 def tfim(q):
-    """Return a Transverse Ising Models (TFIM) circuit."""
+    """Return a Transverse Ising Models (TFIM) circuit.
+
+    from supermarq https://github.com/Infleqtion/client-superstaq
+    """
     return cirq_to_qiskit(HamiltonianSimulation(q, 1 / depth, 0.5).circuit())
 
 
