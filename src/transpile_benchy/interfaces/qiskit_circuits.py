@@ -7,7 +7,7 @@ import networkx as nx
 import numpy as np
 import openfermion as of
 from qiskit import QuantumCircuit
-from qiskit.algorithms import AmplificationProblem, Grover
+from qiskit.algorithms import AmplificationProblem, Grover, Shor
 from qiskit.circuit.library import (
     EfficientSU2,
     HiddenLinearFunction,
@@ -144,6 +144,14 @@ def grover(q):
     return grover_qc
 
 
+# Shor
+def shor(q):
+    """Return a shor circuit."""
+    s = Shor(QuantumCircuit(q))
+    factor = np.random.randint(4, 5000) * 2 + 1  # rand odd number
+    return s.construct_circuit(factor)
+
+
 # Hubbard
 def hub(q):
     """Return a Fermi-Hubbard circuit.
@@ -184,4 +192,5 @@ available_circuits = [
     grover,
     hub,
     tfim,
+    shor,
 ]
