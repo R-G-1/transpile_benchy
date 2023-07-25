@@ -7,7 +7,7 @@ import networkx as nx
 import numpy as np
 import openfermion as of
 from qiskit import QuantumCircuit
-from qiskit.algorithms import AmplificationProblem, Grover, Shor
+from qiskit.algorithms import AmplificationProblem, Grover
 from qiskit.circuit.library import (
     EfficientSU2,
     HiddenLinearFunction,
@@ -146,10 +146,76 @@ def grover(q):
 
 # Shor
 def shor(q):
-    """Return a shor circuit."""
-    s = Shor(QuantumCircuit(q))
-    factor = np.random.randint(4, 5000) * 2 + 1  # rand odd number
-    return s.construct_circuit(factor)
+    """Return a shor circuit.
+
+    Implementation from qiskit textbook.
+    """
+    # Create QuantumCircuit with N_COUNT counting qubits
+    # plus 4 qubits for U to act on
+    qc = QuantumCircuit(q + 4, q)
+
+    # Initialize counting qubits
+    # in state |+>
+    for n in range(q):
+        qc.h(n)
+
+    # And auxiliary register in state |1>
+    qc.x(q)
+
+    # Do controlled-U operations
+    for n in range(q):
+        qc.append(c_amod15(q - 1, 2**n), [n] + [i + q for i in range(4)])
+
+    # Do inverse-QFT
+    qc.append(qft_dagger(q), range(q))
+
+    return qc
+
+
+def c_amod15(a, power):
+    """Control multiplication by a mod 15.
+
+    From qiskit textbook for shors algorithm.
+    """
+    if a not in [2, 4, 7, 8, 11, 13]:
+        raise ValueError("'a' must be 2,4,7,8,11 or 13")
+    U = QuantumCircuit(4)
+    for _iteration in range(power):
+        if a in [2, 13]:
+            U.swap(2, 3)
+            U.swap(1, 2)
+            U.swap(0, 1)
+        if a in [7, 8]:
+            U.swap(0, 1)
+            U.swap(1, 2)
+            U.swap(2, 3)
+        if a in [4, 11]:
+            U.swap(1, 3)
+            U.swap(0, 2)
+        if a in [7, 11, 13]:
+            for q in range(4):
+                U.x(q)
+    U = U.to_gate()
+    U.name = f"{a}^{power} mod 15"
+    c_U = U.control()
+    return c_U
+
+
+def qft_dagger(n):
+    """N-qubit QFTdagger the first n qubits in circ.
+
+    from qiskit textbook on shor's algorithm.
+    """
+    qc = QuantumCircuit(n)
+    # Don't forget the Swaps!
+    for qubit in range(n // 2):
+        qc.swap(qubit, n - qubit - 1)
+    for j in range(n):
+        for m in range(j):
+            qc.cp(-np.pi / float(2 ** (j - m)), m, j)
+        qc.h(j)
+    qc.name = "QFT†"
+    return qc
 
 
 # Hubbard
