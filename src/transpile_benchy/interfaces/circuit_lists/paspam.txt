@@ -11,7 +11,6 @@ shor_26
 qaoa_12
 tfim_16
 tfim_64
-tfxy_16
 tfxy_64
 qaoa_5
 qaoa_10

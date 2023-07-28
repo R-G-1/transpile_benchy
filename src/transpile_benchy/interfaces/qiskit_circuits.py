@@ -244,6 +244,17 @@ def tfim(q):
     return cirq_to_qiskit(HamiltonianSimulation(q, 1 / depth, 0.5).circuit())
 
 
+def tfxy(q=64):
+    """Return TFXY circuit.
+
+    Uses qasm file generated from f3cpp. Currently only tfxy_n64
+    implemented.
+    """
+    if q != 64:
+        raise ValueError("Only tfxy_n64 implemented at this time.")
+    return QuantumCircuit.from_qasm_file("tfxy_n64.qasm")
+
+
 # List of all available circuits
 available_circuits = [
     vqe_full,
@@ -259,4 +270,5 @@ available_circuits = [
     hub,
     tfim,
     shor,
+    tfxy,
 ]
